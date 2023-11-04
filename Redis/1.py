@@ -1,7 +1,7 @@
 import redis
 import json
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk
 
 
 class NumericEntry(tk.Entry):
@@ -29,16 +29,13 @@ class MainWindow(tk.Tk):
         
         self.settings_frame = tk.Frame(self, background="gray")
         self.settings_font_combobox = ttk.Combobox(self.settings_frame)
-        
-        self.dfhgadfhafdhg = (self.ValidateSize, "%P")
-        
         self.settings_size_entry = NumericEntry(self.settings_frame)
         self.settings_color_combobox = ttk.Combobox(self.settings_frame)
         self.settings_font_style_combobox = ttk.Combobox(self.settings_frame)
         
         self.save_button = tk.Button(self)
         self.text_entry = tk.Entry(self)
-        self.format_text_entry = tk.Entry(self)
+        self.format_text = tk.Text(self)
 
         self.Pack()
         self.Config()
@@ -46,7 +43,7 @@ class MainWindow(tk.Tk):
         self.FillFont()
     
     def Pack(self):
-        self.user_combobox.pack(side="top",pady=[10,20])
+        self.user_combobox.pack(side="top", pady=[10,20])
         
         self.settings_frame.pack(side="top", ipadx=10)
         self.settings_font_combobox.pack(side="top", pady=[10,10])
@@ -56,7 +53,7 @@ class MainWindow(tk.Tk):
         
         self.save_button.pack(side="top", pady=[10,20])
         self.text_entry.pack(side="top", pady=[0,10])
-        self.format_text_entry.pack(side="top", pady=[0,10])
+        self.format_text.pack(side="top", pady=[0,10])
     
     def Config(self):
         self.save_button.config(command=self.Save)
@@ -70,8 +67,25 @@ class MainWindow(tk.Tk):
         self.settings_color_combobox.config(state="readonly")
         self.settings_font_style_combobox.config(state="readonly")
         
+        self.text_entry.config(width=40)
+        self.format_text.config(width=40, state='disabled')
+        
     def Save(self):
-        pass
+        self.output_dict = {
+                "full_name": f"{self.user_combobox.get()}",
+                "settings": {
+                    "font": f"{self.settings_font_combobox.get()}",
+                    "size": int(self.settings_size_entry.get()),
+                    "color": f"{self.settings_color_combobox.get()}",
+                    "font_style": f"{self.settings_font_style_combobox.get()}"
+                }
+        }
+        
+        self.connection.set(self.GetUserKey().decode('utf-8'), json.dumps(self.output_dict))
+        
+        self.LoadUsers()
+        self.LoadSettingsData(event=None)
+        
     
     def FillFont(self):
         self.settings_font_combobox["values"] = ["Arial", "Verdana"]
@@ -86,14 +100,20 @@ class MainWindow(tk.Tk):
         
     def LoadSettingsData(self, event):
         self.selected_name = self.user_combobox.get()
-        self.settings_data = [item[1].get("settings") for item in self.user_data if item[1].get("full_name") == self.selected_name][0]
+        self.settings_data_input = [item[1].get("settings") for item in self.user_data if item[1].get("full_name") == self.selected_name][0]
         
-        self.settings_font_combobox.set(self.settings_data.get("font"))
+        self.settings_font_combobox.set(self.settings_data_input.get("font"))
         self.settings_size_entry.delete(0, "end")
-        self.settings_size_entry.insert(0, self.settings_data.get("size"))
-        self.settings_color_combobox.set(self.settings_data.get("color"))
-        self.settings_font_style_combobox.set(self.settings_data.get("font_style"))
+        self.settings_size_entry.insert(0, self.settings_data_input.get("size"))
+        self.settings_color_combobox.set(self.settings_data_input.get("color"))
+        self.settings_font_style_combobox.set(self.settings_data_input.get("font_style"))
         
+    def GetUserKey(self):
+        for i,j in zip(self.user_keys, self.user_names):
+            if j == self.user_combobox.get():
+                user_key = i
+                break
+        return user_key
         
 
 
