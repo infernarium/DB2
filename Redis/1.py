@@ -33,7 +33,7 @@ class MainWindow(tk.Tk):
         self.settings_color_combobox = ttk.Combobox(self.settings_frame)
         self.settings_font_style_combobox = ttk.Combobox(self.settings_frame)
         
-        self.save_button = tk.Button(self)
+        self.save_button = tk.Button(self, text='Сохранить')
         self.text_entry = tk.Entry(self)
         self.format_text = tk.Text(self)
 
@@ -60,14 +60,20 @@ class MainWindow(tk.Tk):
         
         self.user_combobox.config(state="readonly", width=40)
         self.user_combobox.bind("<<ComboboxSelected>>", self.LoadSettingsData)
-        
-        self.settings_size_entry.bind()
-        
+
         self.settings_font_combobox.config(state="readonly")
+        self.settings_font_combobox.bind("<<ComboboxSelected>>", self.CopyEntryText)
+        
         self.settings_color_combobox.config(state="readonly")
+        self.settings_color_combobox.bind("<<ComboboxSelected>>", self.CopyEntryText)
+        
         self.settings_font_style_combobox.config(state="readonly")
+        self.settings_font_style_combobox.bind("<<ComboboxSelected>>", self.CopyEntryText)
+        
+        self.settings_size_entry.bind("<KeyRelease>", self.CopyEntryText)
         
         self.text_entry.config(width=40)
+        self.text_entry.bind("<KeyRelease>", self.CopyEntryText)
         self.format_text.config(width=40, state='disabled')
         
     def Save(self):
@@ -89,8 +95,8 @@ class MainWindow(tk.Tk):
     
     def FillFont(self):
         self.settings_font_combobox["values"] = ["Arial", "Verdana"]
-        self.settings_color_combobox["values"] = ["Red", "Blue", "Yellow", "Green", "Black"]
-        self.settings_font_style_combobox["values"] = ["Thin", "Regular", "Bold"]
+        self.settings_color_combobox["values"] = ["red", "blue", "yellow", "green", "black"]
+        self.settings_font_style_combobox["values"] = ["normal", "bold"]
     
     def LoadUsers(self):
         self.user_keys = self.connection.keys("user:*")
@@ -108,13 +114,23 @@ class MainWindow(tk.Tk):
         self.settings_color_combobox.set(self.settings_data_input.get("color"))
         self.settings_font_style_combobox.set(self.settings_data_input.get("font_style"))
         
+        self.CopyEntryText(event=None)
+        
     def GetUserKey(self):
         for i,j in zip(self.user_keys, self.user_names):
             if j == self.user_combobox.get():
                 user_key = i
                 break
         return user_key
+    
+    def CopyEntryText(self, event):
+        self.format_text.config(state="normal")
+        self.format_text.delete(1.0, tk.END)
         
+        self.format_text.tag_configure('style', font=(f"{self.settings_font_combobox.get()}", int(self.settings_size_entry.get()), f"{self.settings_font_style_combobox.get()}"), foreground=f"{self.settings_color_combobox.get()}",)
+        
+        self.format_text.insert(tk.END, self.text_entry.get(), 'style')
+        self.format_text.config(state="disabled")
 
 
 def fill_bd(connection: redis.StrictRedis):
@@ -124,7 +140,7 @@ def fill_bd(connection: redis.StrictRedis):
         "font": "Arial",
         "size": 10,
         "color": "red",
-        "font_style": "Thin"
+        "font_style": "normal"
         }
     }
     data_json = json.dumps(data)
@@ -137,7 +153,7 @@ def fill_bd(connection: redis.StrictRedis):
         "font": "Verdana",
         "size": 15,
         "color": "yellow",
-        "font_style": "Regular"
+        "font_style": "normal"
         }
     }
     data_json = json.dumps(data)
@@ -150,7 +166,7 @@ def fill_bd(connection: redis.StrictRedis):
         "font": "Arial",
         "size": 6,
         "color": "blue",
-        "font_style": "Bold"
+        "font_style": "bold"
         }
     }
     data_json = json.dumps(data)
