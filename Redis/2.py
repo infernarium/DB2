@@ -6,10 +6,8 @@ from tkinter import ttk
 
 class NumericEntry(tk.Entry):
     def __init__(self, master=None, **kwargs):
-        # Регистрируем функцию валидации
         self.validate_input = master.register(self.validate)
         super().__init__(master, validate="key", validatecommand=(self.validate_input, '%P'), **kwargs)
-
     def validate(self, new_text):
         if (new_text == "" or new_text.isdigit()):
             return True
@@ -52,19 +50,21 @@ class MainWindow(tk.Tk):
         self.rating_list.config(width=60)
         
     def Save(self):
-        print("Сохранил, красавец!")
         RefereeSportsmenPoints = self.GetRefereeSportsmenPoints(self.referee_combobox.get())
-        return
+
         self.output_dict = {
         "full_name": f"{self.referee_combobox.get()}",
         "points": [
-            {"full_name": "Лева Дмитрий Сергеевич", "point" : int(RefereeSportsmenPoints[0] if (self.sportsman_combobox.get() != "Лева Дмитрий Сергеевич") else RefereeSportsmenPoints[0] + self.setted_point_entry.get())},
-            {"full_name": "Семёнов KarelianBear Андреевич", "point" : int(RefereeSportsmenPoints[1] if (self.sportsman_combobox.get() != "Лева Дмитрий Сергеевич") else RefereeSportsmenPoints[1] + self.setted_point_entry.get())},
-            {"full_name": "Рейно Кузьмин Степанович", "point" : int(RefereeSportsmenPoints[2] if (self.sportsman_combobox.get() != "Лева Дмитрий Сергеевич") else RefereeSportsmenPoints[2] + self.setted_point_entry.get())},
+            {"full_name": "Лева Дмитрий Сергеевич", "point" : int(RefereeSportsmenPoints[0] if (self.sportsman_combobox.get() != "Лева Дмитрий Сергеевич") else RefereeSportsmenPoints[0] + int(self.setted_point_entry.get()))},
+            {"full_name": "Семёнов KarelianBear Андреевич", "point" : int(RefereeSportsmenPoints[1] if (self.sportsman_combobox.get() != "Семёнов KarelianBear Андреевич") else RefereeSportsmenPoints[1] + int(self.setted_point_entry.get()))},
+            {"full_name": "Рейно Кузьмин Степанович", "point" : int(RefereeSportsmenPoints[2] if (self.sportsman_combobox.get() != "Рейно Кузьмин Степанович") else RefereeSportsmenPoints[2] + int(self.setted_point_entry.get()))},
             ]
         }
+
+        self.connection.set(self.GetRefereeKey(), json.dumps(self.output_dict))
         
-        self.connection.set(self.GetRefereeKey().decode('utf-8'), json.dumps(self.output_dict))
+        self.LoadReferee()
+        self.FillRating()
     
     def LoadReferee(self):
         self.referee_keys = self.connection.keys("referee:*")
@@ -105,8 +105,6 @@ class MainWindow(tk.Tk):
                 return [point["point"] for point in [chel for chel in referee["points"]]]
         
     
-
-
 def fill_bd(connection: redis.StrictRedis):
     data = {
     "full_name": "Судья Дредд",
