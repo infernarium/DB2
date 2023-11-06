@@ -53,19 +53,18 @@ class MainWindow(tk.Tk):
         
     def Save(self):
         print("Сохранил, красавец!")
+        RefereeSportsmenPoints = self.GetRefereeSportsmenPoints(self.referee_combobox.get())
         return
         self.output_dict = {
-                "full_name": f"{self.referee_combobox.get()}",
-                "settings": {
-                    "font": f"{self.settings_font_combobox.get()}",
-                    "size": int(self.setted_point_entry.get()),
-                    "color": f"{self.sportsman_combobox.get()}",
-                    "font_style": f"{self.settings_font_style_combobox.get()}"
-                }
+        "full_name": f"{self.referee_combobox.get()}",
+        "points": [
+            {"full_name": "Лева Дмитрий Сергеевич", "point" : int(RefereeSportsmenPoints[0] if (self.sportsman_combobox.get() != "Лева Дмитрий Сергеевич") else RefereeSportsmenPoints[0] + self.setted_point_entry.get())},
+            {"full_name": "Семёнов KarelianBear Андреевич", "point" : int(RefereeSportsmenPoints[1] if (self.sportsman_combobox.get() != "Лева Дмитрий Сергеевич") else RefereeSportsmenPoints[1] + self.setted_point_entry.get())},
+            {"full_name": "Рейно Кузьмин Степанович", "point" : int(RefereeSportsmenPoints[2] if (self.sportsman_combobox.get() != "Лева Дмитрий Сергеевич") else RefereeSportsmenPoints[2] + self.setted_point_entry.get())},
+            ]
         }
         
         self.connection.set(self.GetRefereeKey().decode('utf-8'), json.dumps(self.output_dict))
-        self.LoadReferee()
     
     def LoadReferee(self):
         self.referee_keys = self.connection.keys("referee:*")
@@ -100,6 +99,11 @@ class MainWindow(tk.Tk):
                     
         return total_points
     
+    def GetRefereeSportsmenPoints(self, referee_name):
+        for referee in self.referee_data:
+            if referee["full_name"] == referee_name:
+                return [point["point"] for point in [chel for chel in referee["points"]]]
+        
     
 
 
