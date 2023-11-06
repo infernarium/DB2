@@ -86,10 +86,10 @@ class MainWindow(tk.Tk):
     def FillRating(self):
         self.rating_list.delete(0, tk.END)
         # Добавь сортировку по убыванию
-        sportsmen_list = [f"{name} - {self.GetPointsSum(name)}" for name in self.sportsman_names]
+        sportsmen_list = [[name, self.GetPointsSum(name)] for name in self.sportsman_names]
 
-        for sportsman in sportsmen_list:
-            self.rating_list.insert(tk.END, sportsman)
+        for sportsman in sorted(sportsmen_list, key=lambda x: x[1], reverse=True):
+            self.rating_list.insert(tk.END, f"{sportsman[0]} - {sportsman[1]}")
             
     def GetPointsSum(self, sportsman_name):
         total_points = 0
