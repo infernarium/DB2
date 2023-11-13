@@ -55,9 +55,9 @@ class MainWindow(tk.Tk):
         self.output_dict = {
         "full_name": f"{self.referee_combobox.get()}",
         "points": [
-            {"full_name": "Лева Дмитрий Сергеевич", "point" : int(RefereeSportsmenPoints[0] if (self.sportsman_combobox.get() != "Лева Дмитрий Сергеевич") else RefereeSportsmenPoints[0] + int(self.setted_point_entry.get()))},
-            {"full_name": "Семёнов KarelianBear Андреевич", "point" : int(RefereeSportsmenPoints[1] if (self.sportsman_combobox.get() != "Семёнов KarelianBear Андреевич") else RefereeSportsmenPoints[1] + int(self.setted_point_entry.get()))},
-            {"full_name": "Рейно Кузьмин Степанович", "point" : int(RefereeSportsmenPoints[2] if (self.sportsman_combobox.get() != "Рейно Кузьмин Степанович") else RefereeSportsmenPoints[2] + int(self.setted_point_entry.get()))},
+            {"full_name": "Лева Дмитрий Сергеевич", "point" : int(RefereeSportsmenPoints[0] if (self.sportsman_combobox.get() != "Лева Дмитрий Сергеевич") else int(self.setted_point_entry.get()))},
+            {"full_name": "Семёнов KarelianBear Андреевич", "point" : int(RefereeSportsmenPoints[1] if (self.sportsman_combobox.get() != "Семёнов KarelianBear Андреевич") else int(self.setted_point_entry.get()))},
+            {"full_name": "Рейно Кузьмин Степанович", "point" : int(RefereeSportsmenPoints[2] if (self.sportsman_combobox.get() != "Рейно Кузьмин Степанович") else int(self.setted_point_entry.get()))},
             ]
         }
 
