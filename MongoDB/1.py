@@ -9,6 +9,7 @@ db = client['22303']
 collection = db['tumanyan']
 
 pattern_team = {
+    'type': 'team',
     'name': '',
     'city': '',
     'coach name': '', 
@@ -24,6 +25,7 @@ pattern_team = {
 }
 
 pattern_game = {
+    'type': 'game',
     'date': '',
     'score': '',
     'rules violations': [
@@ -60,7 +62,8 @@ pattern_game = {
 	]
 }
 
-team = {
+team1 = {
+    'type': 'team',
     'name': 'Работяги',
     'city': 'Петрозаводск',
     'coach name': 'Жмашенко В. Н.', 
@@ -79,8 +82,29 @@ team = {
     ],
     'reserve players': ['Чурков М. А.', 'Заенко П. Ш.', 'Шиншилин Р. С.', 'Битый А. А.']
 }
+team2 = {
+    'type': 'team',
+    'name': 'Пляска',
+    'city': 'Костомукша',
+    'coach name': 'Жмашенко В. Н.', 
+    'players': [
+        {'name': 'Кузнецов Игорь Арсеньевич', 'position': '1'},
+        {'name': 'Аксёнов Павел Филатович', 'position': '2'},
+        {'name': 'Гаврилов Петр Анатольевич', 'position': '3'},
+        {'name': 'Одинцов Ефрем Павлович', 'position': '4'},
+        {'name': 'Кулаков Соломон Даниилович', 'position': '5'},
+        {'name': 'Юдин Аввакум Всеволодович', 'position': '6'},
+        {'name': 'Сафонов Велорий Иосифович', 'position': '7'},
+        {'name': 'Русаков Климент Геннадиевич', 'position': '8'},
+        {'name': 'Киселёв Александр Эдуардович', 'position': '9'},
+        {'name': 'Гришин Алан Евгеньевич', 'position': '10'},
+        {'name': 'Соловьёв Аввакуум Даниилович', 'position': '11'}
+    ],
+    'reserve players': ['Журавлёв Иннокентий Иринеевич', 'Бобров Марк Федосеевич', 'Вишняков Остап Германнович', 'Петров Самуил Константинович']
+}
 
 game = {
+    'type': 'game',
     'date': '11.09.2023',
     'score': '1:3',
     'rules violations': [
@@ -92,17 +116,12 @@ game = {
 	],
     'penalties': [
 		{'name': 'Лукашенко О. Я.','position': '11','minute': '20', 'pass': 'От стены'}
-	],
-    'shots number on goal': [
-		{'name': 'Огузков О. О.', 'position': '8', 'minute': '15','pass': 'accurate pass'},
-        {'name': 'Чипсиков М. Р.', 'position': '6', 'minute': '19','pass': 'accurate pass'},
-        {'name': 'Лукашенко О. Я.', 'position': '11', 'minute': '16','pass': 'chip pass'},
-        {'name': 'Смирнов П. П.', 'position': '1', 'minute': '25','pass': 'short pass'}
 	]
 }
 
 collection.delete_many({})
-collection.insert_one(team)
+collection.insert_one(team1)
+collection.insert_one(team2)
 collection.insert_one(game)
 
 current_document = copy.deepcopy(pattern_team)
@@ -117,7 +136,7 @@ value_entry = Text()
 value_entry.place(x=20, y=50, width=320, height=120)
 
 documents_text = Text()
-documents_text.place(x=20, y=180, width=860, height=350)
+documents_text.place(x=20, y=180, width=960, height=550)
 documents_text.configure(state=DISABLED)
 
 def update_documents_text():
@@ -186,7 +205,7 @@ save_documents_button.place(x=470, y=140, width=110, height=30)
 def show_documents():
     documents = ''
     for document in collection.find({}, {'_id': 0}):
-        documents += str(document) + '\n\n'
+        documents += str(f"Игра: {document}" if document["type"] == "game" else f"Команда: {document}") + '\n\n'
     documents_text.configure(state=NORMAL)
     documents_text.delete('1.0', END)
     documents_text.insert(1.0, documents)
